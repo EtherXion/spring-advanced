@@ -45,5 +45,5 @@ public class ManagerController {
     ) {
         long userId = (long) request.getAttribute("userId"); // 필터에서 검증한 걸 가져오도록 변경
         managerService.deleteManager(userId, todoId, managerId);
-    }
+    } // 서비스 부분 변경 필요 X?
 }
