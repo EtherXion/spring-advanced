@@ -39,15 +39,15 @@ class ManagerServiceTest {
     private ManagerService managerService;
 
     @Test
-    public void manager_목록_조회_시_Todo가_없다면_NPE_에러를_던진다() {
+    public void manager_목록_조회_시_Todo가_없다면_IRE_에러를_던진다() {
         // given
         long todoId = 1L;
         given(todoRepository.findById(todoId)).willReturn(Optional.empty());
 
         // when & then
         InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> managerService.getManagers(todoId));
-        assertEquals("Manager not found", exception.getMessage());
-    }
+        assertEquals("Todo not found", exception.getMessage());
+    } // 메서드 명 , 오류 발생 시 출력 부분만 변경하는게 맞는 것?
 
     @Test
     void todo의_user가_null인_경우_예외가_발생한다() {
