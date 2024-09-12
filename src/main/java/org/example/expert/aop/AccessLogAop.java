@@ -49,6 +49,9 @@ public class AccessLogAop {
             // 이 경우 요청에 사용자 id가 포함되어 있어야만 가져올 수 있음
             params.put("userId", request.getParameter("userId"));
 
+            // 토큰에서 사용자 Id를 가져오는 방법
+            params.put("userId",userIdFromToken(request));
+
         } catch (Exception e){
 
             log.error("이후 에러 더 정확한 방식으로 수정할 것");
@@ -69,10 +72,16 @@ public class AccessLogAop {
         if (authHeader != null && authHeader.startsWith("Bearer ")) { // 헤더가 Bearer로 시작하는지
             String token = authHeader.substring(7); // 앞의 7자 Bearer 부분 제외하고 토큰 추출
 
+
+
             // 토큰에서 id 부분을 가져와야 함
 //            String userId =
 
-            return token;
+            String userId = "임시 작성";
+
+
+
+            return userId;
         }
         return null;
     }
