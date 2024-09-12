@@ -8,6 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.example.expert.config.JwtUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -22,7 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AccessLogAop {
 
-
+    private final JwtUtil jwtUtil; // 토큰 관련
 
     @Pointcut("execution(* org.example.expert.domain.comment.controller.CommentAdminController.deleteComment(..))")
     private void commentPointcut() {}
@@ -46,8 +47,8 @@ public class AccessLogAop {
             params.put("requestUrl", request.getRequestURL()); // URI URL 어떤거 사용할지
 //            params.put("requestUrl", request.getRequestURI());
 
-            // 이 경우 요청에 사용자 id가 포함되어 있어야만 가져올 수 있음
-            params.put("userId", request.getParameter("userId"));
+//            // 이 경우 요청에 사용자 id가 포함되어 있어야만 가져올 수 있음
+//            params.put("userId", request.getParameter("userId"));
 
             // 토큰에서 사용자 Id를 가져오는 방법
             params.put("userId",userIdFromToken(request));
@@ -58,7 +59,7 @@ public class AccessLogAop {
 
         }
 
-        log.info("{}",params);
+        log.info("API access log : {}",params);
 
         Object result = joinPoint.proceed(); // 기준으로 실행 전 후 구분
 
@@ -70,22 +71,18 @@ public class AccessLogAop {
     private String userIdFromToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization"); // Authorization 헤더의 값 가져옴
         if (authHeader != null && authHeader.startsWith("Bearer ")) { // 헤더가 Bearer로 시작하는지
-            String token = authHeader.substring(7); // 앞의 7자 Bearer 부분 제외하고 토큰 추출
 
+            try {
+                String token = jwtUtil.substringToken(authHeader);
+                String userId = jwtUtil.extractClaims(token).getSubject();
 
+                return userId;
+            } catch (Exception e) {
+                log.error("이후 오류 부분 수정할 것");
+            }
 
-            // 토큰에서 id 부분을 가져와야 함
-//            String userId =
-
-            String userId = "임시 작성";
-
-
-
-            return userId;
         }
         return null;
     }
-
-
 
 }
