@@ -36,14 +36,18 @@ public class AccessLogAop {
         HttpServletRequest request = ((ServletRequestAttributes)
                 RequestContextHolder.getRequestAttributes()).getRequest();
 
+        String methodName = joinPoint.getSignature().getName(); // 어떤 api가 실행된건지
         Map<String, Object> params = new HashMap<>();
 
         try {
 
+            params.put("methodName", methodName);
             params.put("requestTime", LocalDateTime.now());
             params.put("requestUrl", request.getRequestURL()); // URI URL 어떤거 사용할지
-
 //            params.put("requestUrl", request.getRequestURI());
+
+            // 이 경우 요청에 사용자 id가 포함되어 있어야만 가져올 수 있음
+            params.put("userId", request.getParameter("userId"));
 
         } catch (Exception e){
 
@@ -57,6 +61,20 @@ public class AccessLogAop {
 
         return result;
 
+    }
+
+    // 현재 로그인된 사용자가 요청을 할테니 토큰에서 id 를 추출하는 방식?
+    private String userIdFromToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization"); // Authorization 헤더의 값 가져옴
+        if (authHeader != null && authHeader.startsWith("Bearer ")) { // 헤더가 Bearer로 시작하는지
+            String token = authHeader.substring(7); // 앞의 7자 Bearer 부분 제외하고 토큰 추출
+
+            // 토큰에서 id 부분을 가져와야 함
+//            String userId =
+
+            return token;
+        }
+        return null;
     }
 
 
